@@ -2,10 +2,10 @@
   Capstone Project.  Code to run on the EV3 robot (NOT on a laptop).
   This code is the delegate for handling messages from the shared GUI.
   Authors:  Your professors (for the framework)
-    and PUT_YOUR_NAMES_HERE.
+    and Ben Wilfong, Maddie Sorensen, Elijah Huf.
   Spring term, 2018-2019.
 """
-# TODO 1:  Put the name of EACH team member in the above.
+# DONE 1:  Put the name of EACH team member in the above.
 
 import time
 
