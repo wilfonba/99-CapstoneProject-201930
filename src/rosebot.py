@@ -7,8 +7,12 @@
 
   Author:  Your professors (for the framework and lower-level code)
     and PUT_YOUR_NAMES_HERE.
-  Winter term, 2018-2019.
+  Spring term, 2018-2019.
 """
+
+import ev3dev.ev3 as ev3
+import time
+import math
 
 import ev3dev.ev3 as ev3
 import time
@@ -31,8 +35,12 @@ class RoseBot(object):
     def __init__(self):
         # Use these instance variables
         self.sensor_system = SensorSystem()
+        self.sound_system = SoundSystem()
+        self.led_system = LEDSystem()
         self.drive_system = DriveSystem(self.sensor_system)
         self.arm_and_claw = ArmAndClaw(self.sensor_system.touch_sensor)
+        self.beacon_system = BeaconSystem()
+        self.display_system = DisplaySystem()
 
 
 ###############################################################################
@@ -70,102 +78,18 @@ class DriveSystem(object):
         self.wheel_circumference = 1.3 * math.pi
 
     # -------------------------------------------------------------------------
-    # Methods for driving with no external sensor (just the built-in encoders).
+    # Methods for making the robot move.
     # -------------------------------------------------------------------------
 
     def go(self, left_wheel_speed, right_wheel_speed):
         """ Makes the left and right wheel motors spin at the given speeds. """
+        self.left_motor.turn_on(left_wheel_speed)
+        self.right_motor.turn_on(right_wheel_speed)
 
     def stop(self):
         """ Stops the left and right wheel motors. """
-
-    def go_straight_for_seconds(self, seconds, speed):
-        """
-        Makes the robot go straight (forward if speed > 0, else backward)
-        at the given speed for the given number of seconds.
-        """
-
-    def go_straight_for_inches_using_time(self, inches, speed):
-        """
-        Makes the robot go straight at the given speed
-        for the given number of inches, using the approximate
-        conversion factor of 10.0 inches per second at 100 (full) speed.
-        """
-
-    def go_straight_for_inches_using_encoder(self, inches, speed):
-        """
-        Makes the robot go straight (forward if speed > 0, else backward)
-        at the given speed for the given number of inches,
-        using the encoder (degrees traveled sensor) built into the motors.
-        """
-
-    # -------------------------------------------------------------------------
-    # Methods for driving that use the color sensor.
-    # -------------------------------------------------------------------------
-
-    def go_straight_until_intensity_is_less_than(self, intensity, speed):
-        """
-        Goes straight at the given speed until the intensity returned
-        by the color_sensor is less than the given intensity.
-        """
-
-    def go_straight_until_intensity_is_greater_than(self, intensity, speed):
-        """
-        Goes straight at the given speed until the intensity returned
-        by the color_sensor is greater than the given intensity.
-        """
-
-    def go_straight_until_color_is(self, color, speed):
-        """
-        Goes straight at the given speed until the color returned
-        by the color_sensor is equal to the given color.
-        """
-
-    def go_straight_until_color_is_not(self, color, speed):
-        """
-        Goes straight at the given speed until the color returned
-        by the color_sensor is NOT equal to the given color.
-        """
-
-    # -------------------------------------------------------------------------
-    # Methods for driving that use the infrared proximity sensor.
-    # -------------------------------------------------------------------------
-    def go_forward_until_distance_is_less_than(self, inches, speed):
-        """
-        Goes forward at the given speed until the robot is less than
-        the given number of inches from the nearest object that it senses.
-        """
-
-    def go_backward_until_distance_is_greater_than(self, inches, speed):
-        """
-        Goes straight at the given speed until the robot is greater than
-        the given number of inches from the nearest object that it senses.
-        Assumes that it senses an object when it starts.
-        """
-
-    def go_until_distance_is_within(self, delta_inches, speed):
-        """
-        Goes forward or backward, repeated as necessary, until the robot is
-        within the given delta-inches from the nearest object that it senses.
-        """
-
-    # -------------------------------------------------------------------------
-    # Methods for driving that use the infrared beacon sensor.
-    # -------------------------------------------------------------------------
-
-    def spin_clockwise_until_beacon_heading_is_nonnegative(self, speed):
-        pass
-
-    def spin_counterclockwise_until_beacon_heading_is_nonpositive(self, speed):
-        pass
-
-    def go_straight_to_the_beacon(self, speed):
-        """ Assumes that the Beacon is straight ahead. """
-        pass
-
-    # -------------------------------------------------------------------------
-    # Methods for driving that use the camera.
-    # -------------------------------------------------------------------------
+        self.left_motor.turn_off()
+        self.right_motor.turn_off()
 
 
 ###############################################################################
@@ -191,31 +115,6 @@ class ArmAndClaw(object):
         self.touch_sensor = touch_sensor
         self.motor = Motor('A', motor_type='medium')
 
-    def raise_arm(self):
-        """ Raises the Arm until its touch sensor is pressed. """
-
-    def calibrate_arm(self):
-        """
-        Calibrates its Arm, that is:
-          1. Raises its Arm until it is all the way UP
-               (i.e., its touch sensor is pressed)
-          2. Lowers its Arm until it is all the way down
-               (i.e., 14.2 motor revolutions),
-          3. Resets the motor's position to 0.
-        """
-
-    def move_arm_to_position(self, desired_arm_position):
-        """
-        Move its Arm to the given position, where 0 means all the way DOWN.
-        The robot must have previously calibrated its Arm.
-        """
-
-    def lower_arm(self):
-        """
-        Lowers the Arm until it is all the way down, i.e., position 0.
-        The robot must have previously calibrated its Arm.
-        """
-
 
 ###############################################################################
 #    SensorSystem
@@ -231,10 +130,10 @@ class SensorSystem(object):
         self.touch_sensor = TouchSensor(1)
         self.color_sensor = ColorSensor(3)
         self.ir_proximity_sensor = InfraredProximitySensor(4)
+        self.camera = Camera()
         # self.ir_beacon_sensor = InfraredBeaconSensor(4)
         # self.beacon_system =
         # self.display_system =
-        # self.camera =
 
 
 ###############################################################################
@@ -246,11 +145,11 @@ class SoundSystem(object):
     Use this object to make   ** any **   sounds.
     """
 
-    def __init__(self, beeper, tone_maker, speech_maker, song_maker):
-        self.beeper = beeper
-        self.tone_maker = tone_maker
-        self.speech_maker = speech_maker
-        self.song_maker = song_maker
+    def __init__(self):
+        self.beeper = Beeper()
+        self.tone_maker = ToneMaker()
+        self.speech_maker = SpeechMaker()
+        self.song_maker = SongMaker()
 
 
 ###############################################################################
@@ -270,10 +169,15 @@ class LEDSystem(object):
 ###############################################################################
 #    BeaconSystem
 ###############################################################################
+class BeaconSystem(object):
+    pass
+
 
 ###############################################################################
 #    DisplaySystem
 ###############################################################################
+class DisplaySystem(object):
+    pass
 
 
 ###############################################################################
@@ -345,6 +249,16 @@ class ColorSensor(object):
             'White',
             'Brown',
         )
+        self.COLOR_NUMBERS = {
+            'NoColor': 0,
+            'Black': 1,
+            'Blue': 2,
+            'Green': 3,
+            'Yellow': 4,
+            'Red': 5,
+            'White': 6,
+            'Brown': 7,
+        }
 
     def get_reflected_light_intensity(self):
         """
@@ -380,6 +294,21 @@ class ColorSensor(object):
         """
         return self._color_sensor.color
 
+    def get_color_as_name(self):
+        """
+        Same as  get_color  but returns the color as a STRING, in particular,
+        as one of the strings listed in the doc-string for get_color.
+        """
+        return self.COLORS[self.get_color()]
+
+    def get_color_number_from_color_name(self, color_name):
+        """
+        Returns the color NUMBER associated with the given color NAME.
+        The color_name must be one of the 7 strings
+        listed in the doc-string for get_color.
+        """
+        return self.COLOR_NUMBERS[color_name]
+
     def get_raw_color(self):
         """
         Shines red, then green, then blue light down.  Returns the reflected
@@ -387,6 +316,7 @@ class ColorSensor(object):
         Example usage:
             red, green, blue = color_sensor.get_raw_color
         """
+        # Not yet implemented
 
 
 class InfraredProximitySensor(object):
@@ -420,8 +350,9 @@ class InfraredProximitySensor(object):
         in inches, where about 39.37 inches (which is 100 cm) means no object
         is within its field of vision.
         """
-        inches_per_cm = 2.54
-        return 70 * inches_per_cm * self.get_distance() / 100
+        cm_per_inch = 2.54
+        distance = 70 / cm_per_inch * self.get_distance() / 100
+        return distance
 
 
 class InfraredBeaconSensor(object):
@@ -478,6 +409,107 @@ class InfraredBeaconSensor(object):
         return self._ir_sensor.distance
 
 
+###############################################################################
+# Camera
+###############################################################################
+class Camera(object):
+    """
+    A class for a Pixy camera.
+    Use the   PixyMon    program to initialize the camera's firmware.
+    Download the program from the    Windows   link at:
+        http://www.cmucam.org/projects/cmucam5/wiki/Latest_release
+    Learn how to use the Pixy camera's "color signatures" to recognize objects
+        at: http://www.cmucam.org/projects/cmucam5/wiki/Teach_Pixy_an_object.
+    """
+
+    def __init__(self, port=ev3.INPUT_2):
+        try:
+            self.low_level_camera = ev3.Sensor(port, driver_name="pixy-lego")
+        except AssertionError:
+            print("Is the camera plugged into port 2?")
+            print("If that is not the problem, then check whether the camera")
+            print("has gotten into 'Arduino mode', as follows:")
+            print("  In PixyMon, select the gear (Configure) icon,")
+            print("  then look for a tab that has 'Arduino' on its page.")
+            print("  Make sure it says 'Lego' and not 'Arduino'.")
+            print("Note: Only some of the cameras have this option;")
+            print("the others are automatically OK in this regard.")
+        self.set_signature("SIG1")
+
+    def set_signature(self, signature_name):
+        self.low_level_camera.mode = signature_name
+
+    def get_biggest_blob(self):
+        """
+        A "blob" is a collection of connected pixels that are all in the color
+        range specified by a color "signature".  A Blob object stores the Point
+        that is the center (actually, centroid) of the blob along with the
+        width and height of the blob.  For a Pixy camera, the x-coordinate is
+        between 0 and 319 (0 left, 319 right) and the y-coordinate is between
+        0 and 199 (0 TOP, 199 BOTTOM).  See the Blob class below.
+        A Camera returns the largest Blob whose pixels fall within the Camera's
+        current color signature.  A Blob whose width and height are zero
+        indicates that no large enough object within the current color signature
+        was visible.
+        The Camera's color signature defaults to "SIG1", which is the color
+        signature set by selecting the RED light when training the Pixy camera.
+        """
+        return Blob(Point(self.low_level_camera.value(1),
+                          self.low_level_camera.value(2)),
+                    self.low_level_camera.value(3),
+                    self.low_level_camera.value(4))
+
+
+###############################################################################
+# Point (for the Camera class, as well as for general purposes.
+###############################################################################
+class Point(object):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+###############################################################################
+# Blob (for the Camera class).
+###############################################################################
+class Blob(object):
+    """
+    Represents a rectangle in the form that a Pixy camera uses:
+      upper-left corner along with width and height.
+    """
+
+    def __init__(self, center, width, height):
+        self.center = center
+        self.width = width
+        self.height = height
+        self.screen_limits = Point(320, 240)
+
+    def __repr__(self):
+        return "center: ({:3d}, {:3d})  width, height: {:3d} {:3d}.".format(
+            self.center.x, self.center.y, self.width, self.height)
+
+    def get_area(self):
+        return self.width * self.height
+
+    def is_against_left_edge(self):
+        return self.center.x - (self.width + 1) / 2 <= 0
+
+    def is_against_right_edge(self):
+        return self.center.x + (self.width / 2 + 1) / 2 >= self.screen_limits.x
+
+    def is_against_top_edge(self):
+        return self.center.y - (self.height + 1) / 2 <= 0
+
+    def is_against_bottom_edge(self):
+        return self.center.y + (self.height + 1) / 2 >= self.screen_limits.y
+
+    def is_against_an_edge(self):
+        return (self.is_against_left_edge()
+                or self.is_against_right_edge()
+                or self.is_against_top_edge()
+                or self.is_against_bottom_edge())
+
+
 class Beeper(object):
     # Future enhancements: Add volume to all the SoundSystem classes.
     def __init__(self):
@@ -486,7 +518,6 @@ class Beeper(object):
     def beep(self):
         """
         Starts playing a BEEP sound.
-
         Does NOT block, that is, continues immediately to the next statement
         while the sound is being played. Returns a subprocess.Popen,
         so if you want the sound-playing to block until the sound is completed
@@ -494,7 +525,6 @@ class Beeper(object):
         then use   beep  like this:
              beeper = Beeper()
              beeper.beep().wait()
-
         :rtype subprocess.Popen
         """
         return self._beeper.beep()
@@ -508,7 +538,6 @@ class ToneMaker(object):
         """
         Starts playing a tone at the given frequency (in Hz) for the given
         duration (in milliseconds).
-
         Does NOT block, that is, continues immediately to the next statement
         while the sound is being played. Returns a subprocess.Popen,
         so if you want the sound-playing to block until the sound is completed
@@ -516,7 +545,6 @@ class ToneMaker(object):
         then use   tone  like this:
              tone_player = ToneMaker()
              tone_player.play_tone(400, 500).wait()
-
         :rtype subprocess.Popen
         """
         return self._tone_maker.tone(frequency, duration)
@@ -526,7 +554,6 @@ class ToneMaker(object):
         Starts playing a sequence of tones, where each tone is a 3-tuple:
           (frequency, duration, delay_until_next_tone_in_sequence)
         Does NOT block; see   play_tone  above.
-
         Here is a cheerful example, from the ev3 documentation::
             tone_player = ToneMaker()
             tone_player.play_tone_sequence([
@@ -557,7 +584,6 @@ class ToneMaker(object):
         (392, 350, 100), (311.13, 250, 100), (466.16, 25, 100),
         (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
         ]).wait()
-
           :rtype subprocess.Popen
         """
         return self._tone_maker.tone(tones)
@@ -571,7 +597,6 @@ class SpeechMaker(object):
         """
         Speaks the given phrase aloud.
         The phrase must be short.
-
         Does NOT block, that is, continues immediately to the next statement
         while the sound is being played. Returns a subprocess.Popen,
         so if you want the sound-playing to block until the sound is completed
@@ -579,7 +604,8 @@ class SpeechMaker(object):
         then use   speak  like this:
              speech_player = SpeechMaker()
              speech_player.speak().wait()
-
+        IMPORTANT:  speak().wait()  does not appear to work correctly in all
+        circumstances.  Put a   time.sleep()  after a   speak  as needed.
         :type  phrase:  str
         :rtype subprocess.Popen
         """
@@ -636,7 +662,6 @@ class LED(object):
         Sets the brightness of this LED to the specified amount of
         RED and GREEN, respectively, where each argument is a number
         between 0 (none) and 1 (full brightness).
-
         Example:
           left_led = LED()
           left_led.set_color(0.5, 0.33)
@@ -650,3 +675,5 @@ class BeaconButton(object):
 
 class BrickButton(object):
     pass
+
+
