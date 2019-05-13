@@ -11,6 +11,8 @@ import rosebot
 import m2_robot_code as m2
 import m3_robot_code as m3
 
+##########################################################################
+
 
 class MyRobotDelegate(object):
     """
@@ -31,14 +33,38 @@ class MyRobotDelegate(object):
         print_message_received("stop")
         self.robot.drive_system.stop()
 
-    # TODO: Add methods here as needed.
+    def spin_left(self, speed, distance):
+        """Makes the robot spin left x degrees"""
+
+        print_message_received("spin_left", [speed, distance])
+        self.robot.drive_system.left_motor.turn_on(-speed)
+        self.robot.drive_system.right_motor.turn_on(speed)
+        while True:
+            if self.robot.drive_system.right_motor.get_position() >= distance*5.5:
+                self.robot.drive_system.right_motor.reset_position()
+                self.robot.drive_system.left_motor.reset_position()
+                self.robot.drive_system.stop()
+                break
+        return
+
+    def spin_right(self, speed, distance):
+        """Makes the robot spin right x degrees"""
+
+        print_message_received("spin_right", [speed, distance])
+        self.robot.drive_system.left_motor.turn_on(speed)
+        self.robot.drive_system.right_motor.turn_on(-speed)
+        while True:
+            if self.robot.drive_system.left_motor.get_position() >= distance*5.5:
+                self.robot.drive_system.stop()
+                self.robot.drive_system.right_motor.reset_position()
+                self.robot.drive_system.left_motor.reset_position()
+                break
+        return
+
+#########################################################################
 
 
 def print_message_received(method_name, arguments=None):
     print()
     print("The robot's delegate has received a message")
     print("for the  ", method_name, "  method, with arguments", arguments)
-
-
-# TODO: Add functions here as needed.
-
