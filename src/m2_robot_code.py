@@ -61,6 +61,23 @@ class MyRobotDelegate(object):
                 break
         return
 
+    def spin_until(self, speed, x, big_enough, delta):
+        """Turns until signature 1 with set speed to an object who's area is big_enough
+        and spins until the object has the x coordinate x plus or minus delta"""
+
+        print_message_received("spin_until", [speed, x, big_enough, delta])
+        self.robot.drive_system.left_motor.turn_on(speed)
+        self.robot.drive_system.right_motor.turn_on(-speed)
+        while True:
+            biggest_blob = self.robot.sensor_system.camera.get_biggest_blob()
+            print(biggest_blob.center.x, biggest_blob.get_area())
+            if abs(x - biggest_blob.center.x) <= delta and biggest_blob.get_area() >= big_enough:
+                self.robot.drive_system.left_motor.turn_off()
+                self.robot.drive_system.right_motor.turn_off()
+                break
+
+        return
+
 #########################################################################
 
 
