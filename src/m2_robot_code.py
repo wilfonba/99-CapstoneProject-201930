@@ -70,7 +70,6 @@ class MyRobotDelegate(object):
         self.robot.drive_system.right_motor.turn_on(-speed)
         while True:
             biggest_blob = self.robot.sensor_system.camera.get_biggest_blob()
-            print(biggest_blob.center.x, biggest_blob.get_area())
             if abs(x - biggest_blob.center.x) <= delta and biggest_blob.get_area() >= big_enough:
                 self.robot.drive_system.left_motor.turn_off()
                 self.robot.drive_system.right_motor.turn_off()
