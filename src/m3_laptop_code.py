@@ -25,6 +25,36 @@ def get_my_frame(root, window, mqtt_sender):
 
     # Add the rest of your GUI to your frame:
     # TODO: Put your GUI onto your frame (using sub-frames if you wish).
+    arm_up_button = ttk.Button(frame, text='Arm up')
+    speed_entry_box1 = ttk.Entry(frame, width=8)
+    speed_entry_box1.insert(0, '100')
+    speed_entry_box1.grid()
+    arm_up_button.grid()
+
+    arm_calibrate_button = ttk.Button(frame, text='Calibrate Arm')
+    speed_entry_box2 = ttk.Entry(frame, width=8)
+    speed_entry_box2.insert(0, '100')
+    speed_entry_box2.grid()
+    arm_calibrate_button.grid()
+
+    arm_to_button = ttk.Button(frame, text='Arm to')
+    speed_entry_box3 = ttk.Entry(frame, width=8)
+    speed_entry_box3.insert(0, '100')
+    x_entry_box = ttk.Entry(frame, width=8)
+    x_entry_box.grid()
+    speed_entry_box3.grid()
+    arm_to_button.grid()
+
+    arm_down_button = ttk.Button(frame, text='Arm down')
+    speed_entry_box4 = ttk.Entry(frame, width=8)
+    speed_entry_box4.insert(0, '100')
+    speed_entry_box4.grid()
+    arm_down_button.grid()
+
+    arm_up_button['command'] = lambda: handle_arm_up(speed_entry_box1, mqtt_sender)
+    arm_calibrate_button['command'] = lambda: handle_calibrate_arm(speed_entry_box2, mqtt_sender)
+    arm_to_button['command'] = lambda: handle_arm_to(speed_entry_box3, x_entry_box, mqtt_sender)
+    arm_down_button['command'] = lambda: handle_arm_down(speed_entry_box4, mqtt_sender)
 
     # Return your frame:
     return frame
@@ -47,3 +77,27 @@ class MyLaptopDelegate(object):
 
 
 # TODO: Add functions here as needed.
+def handle_arm_up(speed_entry_box, mqtt_sender):
+    print('Handle_arm_up: ', speed_entry_box.get())
+    speed = int(speed_entry_box.get())
+    mqtt_sender.send_message('arm_up', [speed])
+
+
+def handle_calibrate_arm(speed_entry_box, mqtt_sender):
+    print('Handle_calibrate_arm: ', speed_entry_box.get())
+    speed = int(speed_entry_box.get())
+    mqtt_sender.send_message('calibrate_arm', [speed])
+
+
+def handle_arm_to(speed_entry_box, x_entry_box, mqtt_sender):
+    print('Handle_arm_to: ', speed_entry_box.get())
+    speed = int(speed_entry_box.get())
+    position = int(x_entry_box.get())
+    mqtt_sender.send_message('arm_to', [speed, position])
+
+
+def handle_arm_down(speed_entry_box, mqtt_sender):
+    print('Handle_arm_down: ', speed_entry_box.get())
+    speed = int(speed_entry_box.get())
+    mqtt_sender.send_message('arm_down', [speed])
+
