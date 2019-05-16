@@ -61,14 +61,18 @@ class MyRobotDelegate(object):
         self.arm_to(speed, 0)
 
     def go_until_color(self, color):
-        print(color)
         stop_at_color = self.robot.sensor_system.color_sensor.get_color_number_from_color_name(color)
-        print(stop_at_color)
+        self.robot.led_system.right_led.turn_on()
+        self.robot.led_system.left_led.turn_on()
         self.robot.drive_system.go(100, 100)
         while True:
             if self.robot.sensor_system.color_sensor.get_color() == stop_at_color:
                 break
         self.robot.drive_system.stop()
+        self.robot.sound_system.beeper.beep()
+        self.robot.led_system.left_led.turn_off()
+        self.robot.led_system.right_led.turn_off()
+
 
 
 def print_message_received(method_name, arguments=None):
