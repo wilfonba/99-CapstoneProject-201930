@@ -25,13 +25,18 @@ def get_my_frame(root, window, mqtt_sender):
     frame_label.grid(row=0, column=0, columnspan=2)
     # Done 2: Put your name in the above.
 
-    speed_entry = ttk.Entry(frame, width=10)
-    speed_entry.grid(row=1, column=1)
+    # speed_entry = ttk.Entry(frame, width=10)
+    # speed_entry.grid(row=1, column=1)
+
+    speed_slider = ttk.Scale(frame, from_=0, to=100)
+    speed_slider.set(50)
+    speed_slider.grid(row=1, column=1)
 
     speed_entry_label = ttk.Label(frame, text='Speed (0 - 100)')
     speed_entry_label.grid(row=1, column=0)
 
     distance_entry = ttk.Entry(frame, width=10)
+    distance_entry.insert(0, "50")
     distance_entry.grid(row=2, column=1)
 
     distance_entry_label = ttk.Label(frame, text='Distance in Degrees')
@@ -44,9 +49,9 @@ def get_my_frame(root, window, mqtt_sender):
     spin_right_button.grid(row=3, column=1)
 
     spin_left_button['command'] = lambda: handle_spin_left(
-        speed_entry, distance_entry, mqtt_sender)
+        speed_slider, distance_entry, mqtt_sender)
     spin_right_button['command'] = lambda: handle_spin_right(
-        speed_entry, distance_entry, mqtt_sender)
+        speed_slider, distance_entry, mqtt_sender)
 
 ################################################################################
 
@@ -83,6 +88,15 @@ def get_my_frame(root, window, mqtt_sender):
                                                               mqtt_sender)
 
 #######################################################################################################
+
+    dance_button = ttk.Button(frame, text="Dance!")
+    dance_button.grid(row=8, column=0)
+
+    dance_colors_entry = ttk.Entry(frame)
+    dance_colors_entry.grid(row=8, column=1, columnspan=7)
+    dance_colors_entry.insert(0, "Black, White, Red, Yellow, Blue")
+
+    dance_button['command'] = lambda: handle_dance(dance_colors_entry, mqtt_sender)
 
     # Return your frame:
     return frame
@@ -128,3 +142,17 @@ def handle_spin_until(speed_entry, x_entry, big_enough_entry, delta_entry, sende
     big_enough = int(big_enough_entry.get())
     delta = int(delta_entry.get())
     sender.send_message("spin_until", [speed, x, big_enough, delta])
+
+
+def handle_dance(color_entry, sender):
+    color_entry_string = color_entry.get()
+    colors = []
+    individual_color = ""
+    for k in range(len(color_entry_string)):
+        if color_entry_string[k] == ",":
+            colors.append(individual_color)
+            individual_color = ""
+        else:
+            individual_color += color_entry_string[k]
+    print("handle_dance", colors)
+    sender.send_message("dance", [colors])

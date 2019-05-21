@@ -8,6 +8,7 @@
 
 import mqtt_remote_method_calls as mqtt
 import rosebot
+import time
 import m2_robot_code as m2
 import m3_robot_code as m3
 
@@ -74,6 +75,39 @@ class MyRobotDelegate(object):
                 self.robot.drive_system.left_motor.turn_off()
                 self.robot.drive_system.right_motor.turn_off()
                 break
+        return
+
+    def dance(self, colors):
+        print_message_received("dance", [colors])
+        direction = 1
+        colors_passed = []
+        last_color = "NoColor"
+        for k in range(len(colors)):
+            print(colors[(k+1) % len(colors)], colors_passed)
+            for j in range(len(colors_passed)):
+                "**************"
+                if colors[(k + 1) % len(colors)] == colors_passed:
+                    print("++++++++++++++++")
+                    direction = -1*direction
+                    colors_passed = []
+            print(k, colors[k], direction)
+            self.robot.drive_system.left_motor.turn_on(direction * 50)
+            self.robot.drive_system.right_motor.turn_on(direction * 50)
+            while True:
+                color = self.robot.sensor_system.color_sensor.get_color_as_name()
+
+                if color != last_color:
+                    colors_passed.append(last_color)
+                    print(colors_passed)
+
+                if color == colors[k]:
+                    self.robot.drive_system.left_motor.turn_off()
+                    self.robot.drive_system.right_motor.turn_off()
+                    self.robot.sound_system.speech_maker.speak(colors[k])
+                    time.sleep(1.0)
+                    break
+
+                last_color = color
 
         return
 
