@@ -94,7 +94,7 @@ def get_my_frame(root, window, mqtt_sender):
 
     dance_colors_entry = ttk.Entry(frame)
     dance_colors_entry.grid(row=8, column=1, columnspan=7)
-    dance_colors_entry.insert(0, "Black, White, Red, Yellow, Blue")
+    dance_colors_entry.insert(0, "DOES NOT WORK")
 
     dance_button['command'] = lambda: handle_dance(dance_colors_entry, mqtt_sender)
 

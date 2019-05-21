@@ -84,12 +84,6 @@ class MyRobotDelegate(object):
         last_color = "NoColor"
         for k in range(len(colors)):
             print(colors[(k+1) % len(colors)], colors_passed)
-            for j in range(len(colors_passed)):
-                "**************"
-                if colors[(k + 1) % len(colors)] == colors_passed:
-                    print("++++++++++++++++")
-                    direction = -1*direction
-                    colors_passed = []
             print(k, colors[k], direction)
             self.robot.drive_system.left_motor.turn_on(direction * 50)
             self.robot.drive_system.right_motor.turn_on(direction * 50)
@@ -98,7 +92,6 @@ class MyRobotDelegate(object):
 
                 if color != last_color:
                     colors_passed.append(last_color)
-                    print(colors_passed)
 
                 if color == colors[k]:
                     self.robot.drive_system.left_motor.turn_off()
@@ -109,6 +102,12 @@ class MyRobotDelegate(object):
 
                 last_color = color
 
+            for j in range(len(colors_passed)):
+                "**************"
+                if colors[(k + 1) % len(colors)] == colors_passed:
+                    print("++++++++++++++++")
+                    direction = -1*direction
+                    colors_passed = []
         return
 
 #########################################################################
